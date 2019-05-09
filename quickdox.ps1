@@ -7,18 +7,33 @@
 ### Note: Will throw warning on 2016 servers due to get-clientaccessServer deprecation, but is best for compat with 2013 right now because I'm a lazy scripter
 
 ### Assign output location and create path if necessary
+
+Param(
+[Parameter(Mandatory=$false)]
+[switch]$Remote,
+[Parameter(Mandatory=$false)]
+[string]$connectServer
+)
+
 $outputDir = "C:\scripts\quickdox\"
 $outputFileName = "quickdox.htm"
 
 $outputLocation = $outputDir + $outputFileName
 
-### Check for file path existence
 If(!(test-path $outputDir))
 {
-      ### File path not present, create path
       New-Item -ItemType Directory -Force -Path $outputDir
 }
 
+$connectionURL="http://" + $connectServer + "/PowerShell/"
+
+### Connect to remote server if Remote parameter equals $true
+If($Remote) {
+### Ask for credential, build server connection, import session
+    $cred = Get-Credential
+    $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri $connectionURL -Authentication Kerberos -Credential $cred
+    Import-PSSession $session -DisableNameChecking
+}
 
 
 $Header = @"
@@ -51,13 +66,28 @@ Exchange QuickDox
 
 "@
 
- 
+$PowerHeader = @"
+
+ <H3>Power Plan Settings</H3>
+
+"@
+
+$IPHeader = @"
+ <H3>IP Address Settings</H3>
+"@
+
+
+
 
 $Pre = "<H2>Exchange Environment Data</H2>"
 
 $Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:randallv@emergentnetworks.com?Subject=Exchange%20QuickDox">randallv@emergentnetworks.com</a> if you need something else routinely.</h4>'
 
 $orgConfig = Get-organizationConfig | Select-Object -Property name, *mapi* | ConvertTo-Html -Fragment -precontent "$Pre <H3>Org Config</H3>"
+$adfsAuth = Get-organizationConfig | Select-Object -Property name,  @{Name='AdfsAudienceUris';Expression={$_.servers -join ", "}}
+
+If($adfsAuth.AdfsAudienceUris -ne "") {$adfsAuth.AdfsAudienceUris = "Enabled"} else {$adfsAuth.AdfsAudienceUris = "Disabled"}
+$adfsAuth =$adfsAuth | ConvertTo-Html -Fragment -precontent "<H3>ADFS Auth</H3>"
 $serverInfo = Get-ExchangeServer | Select-Object -Property name, serverrole, admindisplayversion, edition | ConvertTo-Html -Fragment -precontent "<H3>Server Information</H3>"
 
 
@@ -73,7 +103,7 @@ $OutputObjPower  = New-Object -Type PSObject
 $OutputObjPower | Add-Member -MemberType NoteProperty -Name ComputerName -Value $planSetting.PSComputerName 
 $OutputObjPower | Add-Member -MemberType NoteProperty -Name PowerPlan -Value $planSetting.ElementName
 
-$PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment 
+$PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment
 
 
 }
@@ -119,7 +149,10 @@ $PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment
  }   
 ### end IP get
 
+
+
 $Databases = Get-mailboxdatabase | Select-Object -Property AdminDisplayName, MasterType, ServerName | ConvertTo-Html -Fragment -precontent "<H3>Database Information</H3>"
+$replStatus = Get-mailboxdatabasecopystatus * | Select-Object -Property Name, Status, CopyQueueLength, ReplayQueueLength, LastInspectedLogTime, ContentIndexState | ConvertTo-Html -Fragment -precontent "<H3>Database Replication Health</H3>"
 $mbxCount = ((Get-Mailbox -ResultSize Unlimited).count).toString()
 $mbxTitle = "Mailbox Count"
 $mbxHTML = ConvertTo-Html -Fragment -precontent "<H3>User Mailbox Count</H3><table><th>$mbxTitle</th><tr><td>$mbxCount</td></tr></table>"
@@ -133,7 +166,7 @@ $autodiscoURIs = get-clientaccessService | Select-Object -Property identity, Aut
 $OAconfig = Get-OutlookAnywhere -ADPropertiesOnly | Select-Object -Property server, *nalhostname, *clientauth*, *ssl*, @{Name='iisauthenticationmethods';Expression={$_.iisauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>Outlook Anywhere Hosts</H3><p>"
 $DAGconfig = Get-DatabaseAvailabilityGroup | Select-Object -Property name, @{Name='servers';Expression={$_.servers -join ", "}} , *centeract*, exchangeversion, @{Name='DatabaseAvailabilityGroupIpv4Addresses';Expression={$_.DatabaseAvailabilityGroupIpv4Addresses -join ", "}}, witness* | ConvertTo-Html -Fragment -precontent "<H3>DAG Information</H3>"
 
-ConvertTo-Html -Head $Header -postcontent $Post -Body "$orgConfig $DAGconfig $serverInfo $Databases $mbxHTML $owaVDirs $ecpVDirs $ewsVDirs $easVDirs $oabVDirs $mapiVDirs $autodiscoURIs $OAconfig $IPinfo $PowerPlaninfo " -title "Exchange QuickDox" | out-file $outputLocation
+ConvertTo-Html -Head $Header -postcontent $Post -Body "$orgConfig $adfsAuth $DAGconfig $serverInfo $Databases $replStatus $mbxHTML $owaVDirs $ecpVDirs $ewsVDirs $easVDirs $oabVDirs $mapiVDirs $autodiscoURIs $OAconfig $IPHeader $IPinfo $PowerHeader $PowerPlaninfo" -title "Exchange QuickDox" | out-file $outputLocation
 #Send-MailMessage -Attachments $outputLocation -From Exchange@milestone.com -To randallv@emergentnetworks.com -Subject "QuickDox" -Body "output of quickdox script." -SmtpServer mail511web01.milestone.local -credential $cred
 
 
