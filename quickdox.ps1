@@ -12,8 +12,10 @@ $outputFileName = "quickdox.htm"
 
 $outputLocation = $outputDir + $outputFileName
 
+### Check for file path existence
 If(!(test-path $outputDir))
 {
+      ### File path not present, create path
       New-Item -ItemType Directory -Force -Path $outputDir
 }
 
