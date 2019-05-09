@@ -17,7 +17,7 @@ If(!(test-path $outputDir))
       New-Item -ItemType Directory -Force -Path $outputDir
 }
 
-#$cred=get-credential
+
 
 $Header = @"
 
