@@ -1,4 +1,4 @@
-﻿### Author: @InvalidCanary
+### Author: @InvalidCanary
 ### Purpose: grabs a handful of raw data, drops into an html file for ease of transport
 ### Parameters: no mandatory params
 ### Variables:  set $outputLocation to an appropriate spot
@@ -92,7 +92,7 @@ $IPHeader = @"
 
 $Pre = "<H2>Exchange Environment Data</H2>"
 
-$Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:randallv@emergentnetworks.com?Subject=Exchange%20QuickDox">randallv@emergentnetworks.com</a> if you need something else routinely.</h4>'
+$Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:rvogsland@presidio.com?Subject=Exchange%20QuickDox">rvogsland@presidio.com</a> if you need something else routinely.</h4>'
 
 $orgConfig = Get-organizationConfig | Select-Object -Property name, *mapi* | ConvertTo-Html -Fragment -precontent "$Pre <H3>Org Config</H3>"
 $adfsAuth = Get-organizationConfig | Select-Object -Property name,  @{Name='AdfsAudienceUris';Expression={$_.servers -join ", "}}
@@ -167,12 +167,12 @@ $replStatus = Get-mailboxdatabasecopystatus * | Select-Object -Property Name, St
 $mbxCount = ((Get-Mailbox -ResultSize Unlimited).count).toString()
 $mbxTitle = "Mailbox Count"
 $mbxHTML = ConvertTo-Html -Fragment -precontent "<H3>User Mailbox Count</H3><table><th>$mbxTitle</th><tr><td>$mbxCount</td></tr></table>"
-$owaVDirs = Get-OwaVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>OWA URLs</H3>"
-$ecpVDirs = Get-ecpVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>ECP URLs</H3>"
-$ewsVDirs = Get-webservicesVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>EWS URLs</H3>"
-$easVDirs = Get-activesyncVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>ActiveSync URLs</H3>"
-$oabVDirs = Get-oabVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>OAB URLs</H3>"
-$mapiVDirs = Get-mapiVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl | ConvertTo-Html -Fragment -precontent "<H3>MAPI URLs</H3>"
+$owaVDirs = Get-OwaVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, *authentication, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}}| ConvertTo-Html -Fragment -precontent "<H3>OWA URLs</H3>"
+$ecpVDirs = Get-ecpVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, *authentication, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>ECP URLs</H3>"
+$ewsVDirs = Get-webservicesVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, *authentication, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>EWS URLs</H3>"
+$easVDirs = Get-activesyncVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>ActiveSync URLs</H3>"
+$oabVDirs = Get-oabVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, *authentication, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>OAB URLs</H3>"
+$mapiVDirs = Get-mapiVirtualDirectory -ADPropertiesOnly | Select-Object -Property identity, *nalurl, @{Name='iisauthenticationmethods';Expression={$_.iisauthenticationmethods -join ", "}}, @{Name='internalauthenticationmethods';Expression={$_.internalauthenticationmethods -join ", "}}, @{Name='externalauthenticationmethods';Expression={$_.externalauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>MAPI URLs</H3>"
 $autodiscoURIs = get-clientaccessService | Select-Object -Property identity, AutoDiscoverServiceInternalUri | ConvertTo-Html -Fragment -precontent "<H3>AutoDiscover Configuration URLs</H3>"
 $OAconfig = Get-OutlookAnywhere -ADPropertiesOnly | Select-Object -Property server, *nalhostname, *clientauth*, *ssl*, @{Name='iisauthenticationmethods';Expression={$_.iisauthenticationmethods -join ", "}} | ConvertTo-Html -Fragment -precontent "<H3>Outlook Anywhere Hosts</H3><p>"
 $DAGconfig = Get-DatabaseAvailabilityGroup | Select-Object -Property name, @{Name='servers';Expression={$_.servers -join ", "}} , *centeract*, exchangeversion, @{Name='DatabaseAvailabilityGroupIpv4Addresses';Expression={$_.DatabaseAvailabilityGroupIpv4Addresses -join ", "}}, witness* | ConvertTo-Html -Fragment -precontent "<H3>DAG Information</H3>"
@@ -183,3 +183,4 @@ ConvertTo-Html -Head $Header -postcontent $Post -Body "$orgConfig $adfsAuth $DAG
 
 # @{Name='iisauthenticationmethods';Expression={($_ | Select -ExpandProperty iisauthenticationmethods | Select -ExpandProperty Name) -join ","}}
 # @{Name='DatabaseAvailabilityGroupIpv4Addresses';Expression={$_.DatabaseAvailabilityGroupIpv4Addresses -join ", "}} 
+
