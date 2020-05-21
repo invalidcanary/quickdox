@@ -5,6 +5,8 @@
 ### Example: .\quickdox.ps1 
 ### Note: nothing fancy here, just raw dumps.  no error handling, no version checking.
 ### Note: Will throw warning on 2016 servers due to get-clientaccessServer deprecation, but is best for compat with 2013 right now because I'm a lazy scripter
+
+### Future Feature Adds
 ### Add: export/auto import of cert
 ### Add: .NET version installed
 ### Add: mbx sizing
