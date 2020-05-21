@@ -104,7 +104,7 @@ $serverInfo = Get-ExchangeServer | Select-Object -Property name, serverrole, adm
 
 
 ### get server IP information and Power Information
-$exServers = get-exchangeServer | foreach { $_.Identity}
+$exServers = get-exchangeServer | ForEach-Object { $_.Identity}
 
 foreach ($Computer in $exServers) { 
 $planSetting = Get-WmiObject -Class win32_powerplan -Namespace root\cimv2\power -Filter "isActive='true'" -ComputerName $Computer -ErrorAction SilentlyContinue
@@ -178,6 +178,7 @@ $OAconfig = Get-OutlookAnywhere -ADPropertiesOnly | Select-Object -Property serv
 $DAGconfig = Get-DatabaseAvailabilityGroup | Select-Object -Property name, @{Name='servers';Expression={$_.servers -join ", "}} , *centeract*, exchangeversion, @{Name='DatabaseAvailabilityGroupIpv4Addresses';Expression={$_.DatabaseAvailabilityGroupIpv4Addresses -join ", "}}, witness* | ConvertTo-Html -Fragment -precontent "<H3>DAG Information</H3>"
 
 ConvertTo-Html -Head $Header -postcontent $Post -Body "$orgConfig $adfsAuth $DAGconfig $serverInfo $Databases $replStatus $mbxHTML $owaVDirs $ecpVDirs $ewsVDirs $easVDirs $oabVDirs $mapiVDirs $autodiscoURIs $OAconfig $IPHeader $IPinfo $PowerHeader $PowerPlaninfo" -title "Exchange QuickDox" | out-file $outputLocation
+#if send=yes then blah blah
 #Send-MailMessage -Attachments $outputLocation -From Exchange@milestone.com -To randallv@emergentnetworks.com -Subject "QuickDox" -Body "output of quickdox script." -SmtpServer mail511web01.milestone.local -credential $cred
 
 
