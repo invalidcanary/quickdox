@@ -148,7 +148,8 @@ $PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment
     $OutputObj | Add-Member -MemberType NoteProperty -Name Gateway -Value $DefaultGateway            
     $OutputObj | Add-Member -MemberType NoteProperty -Name IsDHCPEnabled -Value $IsDHCPEnabled            
     $OutputObj | Add-Member -MemberType NoteProperty -Name DNSServers -Value $DNSServers 
-    
+    $OutputObj | Add-Member -MemberType NoteProperty -Name MACAddress -Value $MACAddress 
+
     # @{Name='DNSServerSearchOrder';Expression={$_.DNSServerSearchOrder -join '; '}}          
    # $OutputObj | Add-Member -MemberType NoteProperty -Name MACAddress -Value $MACAddress            
     
