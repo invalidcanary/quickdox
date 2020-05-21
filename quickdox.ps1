@@ -52,48 +52,30 @@ If($Remote) {
 $Header = @"
 
 <style>
-
 BODY{font-family: Verdana; font-size: 10pt;}
-
 H1{font-size: 22px;}
-
 H2{font-size: 20px; padding-top: 10px;}
-
 H3{font-size: 12px; padding-top: 8px;}
-
 H4{font-size: 10px; padding-top: 8px;}
-
 TABLE {font-family: verdana; font-size: 10px; border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}
-
 TH {border-width: 1px;padding: 3px;border-style: solid;border-color: gray;background-color: #e89d3a;}
-
 TD {border-width: 1px;padding: 3px;border-style: solid;border-color: gray;}
-
 </style>
-
 <title>
-
 Exchange QuickDox
-
 </title>
 
 "@
 
 $PowerHeader = @"
-
  <H3>Power Plan Settings</H3>
-
 "@
 
 $IPHeader = @"
  <H3>IP Address Settings</H3>
 "@
 
-
-
-
 $Pre = "<H2>Exchange Environment Data</H2>"
-
 $Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:rvogsland@presidio.com?Subject=Exchange%20QuickDox">rvogsland@presidio.com</a> if you need something else routinely.</h4>'
 
 $orgConfig = Get-organizationConfig | Select-Object -Property name, *mapi* | ConvertTo-Html -Fragment -precontent "$Pre <H3>Org Config</H3>"
@@ -102,7 +84,6 @@ $adfsAuth = Get-organizationConfig | Select-Object -Property name,  @{Name='Adfs
 If($adfsAuth.AdfsAudienceUris -ne "") {$adfsAuth.AdfsAudienceUris = "Enabled"} else {$adfsAuth.AdfsAudienceUris = "Disabled"}
 $adfsAuth =$adfsAuth | ConvertTo-Html -Fragment -precontent "<H3>ADFS Auth</H3>"
 $serverInfo = Get-ExchangeServer | Select-Object -Property name, serverrole, admindisplayversion, edition | ConvertTo-Html -Fragment -precontent "<H3>Server Information</H3>"
-
 
 
 ### get server IP information and Power Information
@@ -117,10 +98,7 @@ $OutputObjPower | Add-Member -MemberType NoteProperty -Name ComputerName -Value 
 $OutputObjPower | Add-Member -MemberType NoteProperty -Name PowerPlan -Value $planSetting.ElementName
 
 $PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment
-
-
 }
-
 
      
  foreach ($Computer in $exServers) {            
@@ -148,7 +126,7 @@ $PowerPlaninfo += $OutputObjPower | ConvertTo-Html -Fragment
     $OutputObj | Add-Member -MemberType NoteProperty -Name Gateway -Value $DefaultGateway            
     $OutputObj | Add-Member -MemberType NoteProperty -Name IsDHCPEnabled -Value $IsDHCPEnabled            
     $OutputObj | Add-Member -MemberType NoteProperty -Name DNSServers -Value $DNSServers 
-    $OutputObj | Add-Member -MemberType NoteProperty -Name MACAddress -Value $MACAddress 
+    # $OutputObj | Add-Member -MemberType NoteProperty -Name MACAddress -Value $MACAddress 
 
     # @{Name='DNSServerSearchOrder';Expression={$_.DNSServerSearchOrder -join '; '}}          
    # $OutputObj | Add-Member -MemberType NoteProperty -Name MACAddress -Value $MACAddress            
