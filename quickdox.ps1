@@ -160,7 +160,7 @@ $DAGconfig = Get-DatabaseAvailabilityGroup | Select-Object -Property name, @{Nam
 
 ConvertTo-Html -Head $Header -postcontent $Post -Body "$orgConfig $adfsAuth $DAGconfig $serverInfo $Databases $replStatus $mbxHTML $owaVDirs $ecpVDirs $ewsVDirs $easVDirs $oabVDirs $mapiVDirs $autodiscoURIs $OAconfig $IPHeader $IPinfo $PowerHeader $PowerPlaninfo" -title "Exchange QuickDox" | out-file $outputLocation
 #if send=yes then blah blah
-#Send-MailMessage -Attachments $outputLocation -From Exchange@milestone.com -To randallv@emergentnetworks.com -Subject "QuickDox" -Body "output of quickdox script." -SmtpServer mail511web01.milestone.local -credential $cred
+#Send-MailMessage -Attachments $outputLocation -From Exchange@invalidcanary.com -To randallv@dawho.com -Subject "QuickDox" -Body "output of quickdox script." -SmtpServer phobos.dawho.com -credential $cred
 
 
 # @{Name='iisauthenticationmethods';Expression={($_ | Select -ExpandProperty iisauthenticationmethods | Select -ExpandProperty Name) -join ","}}
