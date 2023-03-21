@@ -76,7 +76,7 @@ $IPHeader = @"
 "@
 
 $Pre = "<H2>Exchange Environment Data</H2>"
-$Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:rvogsland@presidio.com?Subject=Exchange%20QuickDox">rvogsland@presidio.com</a> if you need something else routinely.</h4>'
+$Post = '<h4>Quick and Dirty report.  Yell at <a href="mailto:acer@dawho.com?Subject=Exchange%20QuickDox">acer@dawho.com</a> if you need something else routinely.</h4>'
 
 $orgConfig = Get-organizationConfig | Select-Object -Property name, *mapi* | ConvertTo-Html -Fragment -precontent "$Pre <H3>Org Config</H3>"
 $adfsAuth = Get-organizationConfig | Select-Object -Property name,  @{Name='AdfsAudienceUris';Expression={$_.servers -join ", "}}
